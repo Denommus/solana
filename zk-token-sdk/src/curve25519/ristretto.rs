@@ -9,10 +9,9 @@ pub struct PodRistrettoPoint(pub [u8; 32]);
 mod target_arch {
     use {
         super::*,
-        crate::curve25519::{
-            curve_syscall_traits::{GroupOperations, MultiScalarMultiplication, PointValidation},
-            errors::Curve25519Error,
-            scalar::PodScalar,
+        crate::curve25519::{errors::Curve25519Error, scalar::PodScalar},
+        crate::curve_syscall_traits::{
+            GroupOperations, MultiScalarMultiplication, PointValidation,
         },
         curve25519_dalek::{
             ristretto::{CompressedRistretto, RistrettoPoint},
