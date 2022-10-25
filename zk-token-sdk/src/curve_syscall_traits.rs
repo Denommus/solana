@@ -79,6 +79,7 @@ pub trait Pairing {
 
 pub const CURVE25519_EDWARDS: u64 = 0;
 pub const CURVE25519_RISTRETTO: u64 = 1;
+pub const CURVEBN: u64 = 2;
 
 pub const ADD: u64 = 0;
 pub const SUB: u64 = 1;

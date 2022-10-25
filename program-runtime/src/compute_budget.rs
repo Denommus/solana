@@ -92,6 +92,14 @@ pub struct ComputeBudget {
     /// Number of compute units consumed for a multiscalar multiplication (msm) of ristretto points.
     /// The total cost is calculated as `msm_base_cost + (length - 1) * msm_incremental_cost`.
     pub curve25519_ristretto_msm_incremental_cost: u64,
+    /// Number of compute units consumed to validate a curve BN point
+    pub curvebn_validate_point_cost: u64,
+    /// Number of compute units consumed to add two curve BN points
+    pub curvebn_add_cost: u64,
+    /// Number of compute units consumed to subtract two curve BN points
+    pub curvebn_subtract_cost: u64,
+    /// Number of compute units consumed to multiply a curve BN point
+    pub curvebn_multiply_cost: u64,
     /// Optional program heap region size, if `None` then loader default
     pub heap_size: Option<usize>,
     /// Number of compute units per additional 32k heap above the default (~.5
@@ -141,6 +149,10 @@ impl ComputeBudget {
             curve25519_ristretto_multiply_cost: 1_804,
             curve25519_ristretto_msm_base_cost: 1_870,
             curve25519_ristretto_msm_incremental_cost: 670,
+            curvebn_validate_point_cost: 0,
+            curvebn_add_cost: 0,
+            curvebn_subtract_cost: 0,
+            curvebn_multiply_cost: 0,
             heap_size: None,
             heap_cost: 8,
             mem_op_base_cost: 10,

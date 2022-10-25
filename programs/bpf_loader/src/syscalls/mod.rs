@@ -1,3 +1,5 @@
+use solana_zk_token_sdk::curvebn;
+
 pub use self::{
     cpi::{SyscallInvokeSignedC, SyscallInvokeSignedRust},
     logging::{
@@ -940,6 +942,24 @@ declare_syscall!(
                     Ok(1)
                 }
             }
+            CURVEBN => {
+                let cost = invoke_context
+                    .get_compute_budget()
+                    .curvebn_validate_point_cost;
+                invoke_context.get_compute_meter().consume(cost)?;
+
+                let point = translate_type::<curvebn::PodBnPoint>(
+                    memory_mapping,
+                    point_addr,
+                    invoke_context.get_check_aligned(),
+                )?;
+
+                if curvebn::validate_bn(point) {
+                    Ok(0)
+                } else {
+                    Ok(1)
+                }
+            }
             _ => Ok(1),
         }
     }
@@ -1130,6 +1150,86 @@ declare_syscall!(
 
                     if let Some(result_point) = ristretto::multiply_ristretto(scalar, input_point) {
                         *translate_type_mut::<ristretto::PodRistrettoPoint>(
+                            memory_mapping,
+                            result_point_addr,
+                            invoke_context.get_check_aligned(),
+                        )? = result_point;
+                        Ok(0)
+                    } else {
+                        Ok(1)
+                    }
+                }
+                _ => Ok(1),
+            },
+            CURVEBN => match group_op {
+                ADD => {
+                    let cost = invoke_context.get_compute_budget().curvebn_add_cost;
+                    invoke_context.get_compute_meter().consume(cost)?;
+                    let left_point = translate_type::<curvebn::PodBnPoint>(
+                        memory_mapping,
+                        left_input_addr,
+                        invoke_context.get_check_aligned(),
+                    )?;
+                    let right_point = translate_type::<curvebn::PodBnPoint>(
+                        memory_mapping,
+                        right_input_addr,
+                        invoke_context.get_check_aligned(),
+                    )?;
+
+                    if let Some(result_point) = curvebn::add_bn(left_point, right_point) {
+                        *translate_type_mut::<curvebn::PodBnPoint>(
+                            memory_mapping,
+                            result_point_addr,
+                            invoke_context.get_check_aligned(),
+                        )? = result_point;
+                        Ok(0)
+                    } else {
+                        Ok(1)
+                    }
+                }
+                SUB => {
+                    let cost = invoke_context.get_compute_budget().curvebn_subtract_cost;
+                    invoke_context.get_compute_meter().consume(cost)?;
+
+                    let left_point = translate_type::<curvebn::PodBnPoint>(
+                        memory_mapping,
+                        left_input_addr,
+                        invoke_context.get_check_aligned(),
+                    )?;
+                    let right_point = translate_type::<curvebn::PodBnPoint>(
+                        memory_mapping,
+                        right_input_addr,
+                        invoke_context.get_check_aligned(),
+                    )?;
+
+                    if let Some(result_point) = curvebn::add_bn(left_point, right_point) {
+                        *translate_type_mut::<curvebn::PodBnPoint>(
+                            memory_mapping,
+                            result_point_addr,
+                            invoke_context.get_check_aligned(),
+                        )? = result_point;
+                        Ok(0)
+                    } else {
+                        Ok(1)
+                    }
+                }
+                MUL => {
+                    let cost = invoke_context.get_compute_budget().curvebn_multiply_cost;
+                    invoke_context.get_compute_meter().consume(cost)?;
+
+                    let scalar = translate_type::<curvebn::PodBnScalar>(
+                        memory_mapping,
+                        left_input_addr,
+                        invoke_context.get_check_aligned(),
+                    )?;
+                    let input_point = translate_type::<curvebn::PodBnPoint>(
+                        memory_mapping,
+                        right_input_addr,
+                        invoke_context.get_check_aligned(),
+                    )?;
+
+                    if let Some(result_point) = curvebn::multiply_bn(scalar, input_point) {
+                        *translate_type_mut::<curvebn::PodBnPoint>(
                             memory_mapping,
                             result_point_addr,
                             invoke_context.get_check_aligned(),
