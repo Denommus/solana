@@ -2415,6 +2415,9 @@ name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+dependencies = [
+ "spin 0.5.2",
+]
 
 [[package]]
 name = "lazycell"
@@ -3978,6 +3981,12 @@ name = "rustc-hash"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
+
+[[package]]
+name = "rustc-hex"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e75f6a532d0fd9f7f13144f392b6ad56a32696bfcd9c78f797f16bbb6f072d6"
 
 [[package]]
 name = "rustc_version"
@@ -6811,6 +6820,7 @@ dependencies = [
  "solana-program 1.15.0",
  "solana-sdk 1.15.0",
  "subtle",
+ "tbn",
  "thiserror",
  "zeroize",
 ]
@@ -7103,6 +7113,18 @@ dependencies = [
  "proc-macro2 1.0.41",
  "quote 1.0.18",
  "syn 1.0.98",
+]
+
+[[package]]
+name = "tbn"
+version = "0.4.4"
+source = "git+https://github.com/Denommus/tbn?rev=93a1948d667f115ed4ea20287563979eacec4b8c#93a1948d667f115ed4ea20287563979eacec4b8c"
+dependencies = [
+ "byteorder",
+ "crunchy",
+ "lazy_static",
+ "rand 0.7.3",
+ "rustc-hex",
 ]
 
 [[package]]
