@@ -157,12 +157,14 @@ pub struct JsonRpcConfig {
     pub obsolete_v1_7_api: bool,
     pub rpc_scan_and_fix_roots: bool,
     pub max_request_body_size: Option<usize>,
+    pub rpc_debug: bool,
 }
 
 impl JsonRpcConfig {
     pub fn default_for_test() -> Self {
         Self {
             full_api: true,
+            rpc_debug: true,
             ..Self::default()
         }
     }
@@ -2944,6 +2946,28 @@ pub mod rpc_bank {
                     },
                 },
             ))
+        }
+    }
+}
+
+// RPC interface for debugging the Solana validator itself
+pub mod rpc_debug {
+    use super::*;
+    #[rpc]
+    pub trait DebugControl {
+        type Metadata;
+
+        #[rpc(meta, name = "rewindToBankHeight")]
+        fn rewind_to_bank_height(&self, meta: Self::Metadata, slot: Slot) -> Result<Vec<Slot>>;
+    }
+
+    pub struct DebugControlImpl;
+    impl DebugControl for DebugControlImpl {
+        type Metadata = JsonRpcRequestProcessor;
+
+        fn rewind_to_bank_height(&self, meta: Self::Metadata, slot: Slot) -> Result<Vec<Slot>> {
+            let mut bank_forks = meta.bank_forks.write().unwrap();
+            Ok(bank_forks.set_highest_slot(slot))
         }
     }
 }

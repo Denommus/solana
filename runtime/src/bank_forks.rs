@@ -1,5 +1,7 @@
 //! The `bank_forks` module implements BankForks a DAG of checkpointed Banks
 
+use itertools::Itertools;
+
 use {
     crate::{
         accounts_background_service::{AbsRequestSender, SnapshotRequest, SnapshotRequestType},
@@ -11,7 +13,7 @@ use {
     solana_measure::measure::Measure,
     solana_sdk::{clock::Slot, feature_set, hash::Hash, timing},
     std::{
-        collections::{hash_map::Entry, HashMap, HashSet},
+        collections::{hash_map::Entry, BTreeSet, HashMap, HashSet},
         ops::Index,
         sync::{
             atomic::{AtomicBool, AtomicU64, Ordering},
@@ -497,6 +499,15 @@ impl BankForks {
             ("accounts_data_len", set_root_metrics.accounts_data_len, i64),
         );
         removed_banks
+    }
+
+    pub fn set_highest_slot(&mut self, slot: Slot) -> Vec<Slot> {
+        let ordered: BTreeSet<_> = self
+            .banks()
+            .into_keys()
+            .filter(|s| *s > slot && self.remove(*s).is_some())
+            .collect();
+        ordered.into_iter().collect_vec()
     }
 
     pub fn root(&self) -> Slot {

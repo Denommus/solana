@@ -2605,6 +2605,7 @@ pub fn main() {
                 "rpc_max_request_body_size",
                 usize
             )),
+            rpc_debug: false,
         },
         geyser_plugin_config_files,
         rpc_addrs: value_t!(matches, "rpc_port", u16).ok().map(|rpc_port| {
